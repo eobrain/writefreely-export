@@ -91,7 +91,7 @@ console.log(`Writing to ${contentDir}/`)
 // Extract maekdown from DB and write to separate files, one per post,
 // with all the writes happening aynchronously in parallel
 const promises = []
-promises.push(exec(`cp -r ${imgPath} ${imgDir}`))
+promises.push(exec(`cp -r ${imgPath}/* ${imgDir}`))
 promises.push(fs.writeFile(`${contentDir}/config.json`, JSON.stringify(config, null, 2)))
 
 let index = 0
