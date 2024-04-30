@@ -1,9 +1,11 @@
 {
   "name": "writefreely-export",
+  "type": "module",
   "version": "0.0.1",
   "description": "Export From Writefreely",
   "main": "index.js",
   "scripts": {
+    "export": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,5 +13,10 @@
     "url": "github.com:eobrain/writefreely-export.git"
   },
   "author": "Eamonn O'Brien-Strain",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^9.6.0",
+    "glob": "^10.3.12",
+    "ini": "^4.1.2"
+  }
 }
