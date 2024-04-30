@@ -79,6 +79,10 @@ function extractFrontMatter (inputMarkdown) {
   return { frontMatter, markdown }
 }
 
+const frontMatterText = obj =>
+    `---  \n${Object.entries(obj).map(([k, v]) => `${k}: ${v}`).join('\n')
+    }\n---  \n`
+
 console.log(`Writing to ${contentDir}/`)
 
 // Extract maekdown from DB and write to separate files, one per post,
@@ -87,20 +91,18 @@ const promises = []
 promises.push(exec(`cp -r ${imgPath} ${imgDir}`))
 promises.push(fs.writeFile(`${contentDir}/config.json`, JSON.stringify(config, null, 2)))
 
-const pageMetadata = []
 for (const { id, slug, title, content } of selectPages.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${pagesDir}/${actualSlug}.md`, markdown))
-  pageMetadata.push({
+  const metadata = {
     slug: actualSlug,
     title: actualTitle
-  })
+  }
+  promises.push(fs.writeFile(`${pagesDir}/${actualSlug}.md`,
+    frontMatterText(metadata) + markdown))
 }
-promises.push(fs.writeFile(`${contentDir}/page_metadata.json`, JSON.stringify(pageMetadata, null, 2)))
 
-const postMetadata = []
 for (const { id, slug, title, created, content } of selectPosts.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const prelude = []
@@ -116,25 +118,28 @@ for (const { id, slug, title, created, content } of selectPosts.iterate()) {
   }
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${postsDir}/${actualSlug}.md`, prelude.join('\n') + markdown))
-  postMetadata.push({
+  const metadata = {
     slug: actualSlug,
     title: actualTitle,
     created: created || frontMatter.date,
     ref: frontMatter.ref,
     image: frontMatter.image
-  })
+  }
+  promises.push(fs.writeFile(`${postsDir}/${actualSlug}.md`,
+    frontMatterText(metadata) + prelude.join('\n') + markdown))
 }
-promises.push(fs.writeFile(`${contentDir}/post_metadata.json`, JSON.stringify(postMetadata, null, 2)))
 
-const draftMetadata = []
 for (const { id, slug, title, created, content } of selectDrafts.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${draftsDir}/${actualSlug}.md`, markdown))
-  draftMetadata.push({ slug: actualSlug, title: actualTitle, created: created || frontMatter.date })
+  const metadata = {
+    slug: actualSlug,
+    title: actualTitle,
+    created: created || frontMatter.date
+  }
+  promises.push(fs.writeFile(`${draftsDir}/${actualSlug}.md`,
+    frontMatterText(metadata) + markdown))
 }
-promises.push(fs.writeFile(`${contentDir}/draft_metadata.json`, JSON.stringify(draftMetadata, null, 2)))
 
 await Promise.all(promises)
