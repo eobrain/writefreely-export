@@ -44,11 +44,13 @@ ORDER BY pinned_position
 `)
 
 const contentDir = 'content'
-const markdownDir = `${contentDir}/markdown`
+const postsDir = `${contentDir}/posts`
+const pagesDir = `${contentDir}/pages`
+const draftsDir = `${contentDir}/drafts`
 const imgDir = `${contentDir}/img`
-await mkdirIfNecessary(contentDir)
-await mkdirIfNecessary(markdownDir)
-await mkdirIfNecessary(imgDir)
+for (const dir of [contentDir, postsDir, pagesDir, draftsDir, imgDir]) {
+  await mkdirIfNecessary(dir)
+}
 
 const slugSet = new Set()
 function uniqueSlug (slug, id) {
@@ -88,7 +90,7 @@ for (const { id, slug, title, content } of selectPages.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${markdownDir}/${actualSlug}.md`, markdown))
+  promises.push(fs.writeFile(`${pagesDir}/${actualSlug}.md`, markdown))
   pageMetadata.push({
     slug: actualSlug,
     title: actualTitle
@@ -112,7 +114,7 @@ for (const { id, slug, title, created, content } of selectPosts.iterate()) {
   }
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${markdownDir}/${actualSlug}.md`, prelude.join('\n') + markdown))
+  promises.push(fs.writeFile(`${postsDir}/${actualSlug}.md`, prelude.join('\n') + markdown))
   postMetadata.push({
     slug: actualSlug,
     title: actualTitle,
@@ -128,7 +130,7 @@ for (const { id, slug, title, created, content } of selectDrafts.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
-  promises.push(fs.writeFile(`${markdownDir}/${actualSlug}.md`, markdown))
+  promises.push(fs.writeFile(`${draftsDir}/${actualSlug}.md`, markdown))
   draftMetadata.push({ slug: actualSlug, title: actualTitle, created: created || frontMatter.date })
 }
 promises.push(fs.writeFile(`${contentDir}/draft_metadata.json`, JSON.stringify(draftMetadata, null, 2)))
