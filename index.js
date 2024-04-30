@@ -80,7 +80,10 @@ function extractFrontMatter (inputMarkdown) {
 }
 
 const frontMatterText = obj =>
-    `---  \n${Object.entries(obj).map(([k, v]) => `${k}: ${v}`).join('\n')
+    `---  \n${Object.entries(obj)
+        .filter(([k, v]) => v !== undefined)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('\n')
     }\n---  \n`
 
 console.log(`Writing to ${contentDir}/`)
