@@ -79,6 +79,8 @@ function extractFrontMatter (inputMarkdown) {
   return { frontMatter, markdown }
 }
 
+console.log(`Writing to ${contentDir}/`)
+
 // Extract maekdown from DB and write to separate files, one per post,
 // with all the writes happening aynchronously in parallel
 const promises = []
