@@ -94,11 +94,13 @@ const promises = []
 promises.push(exec(`cp -r ${imgPath} ${imgDir}`))
 promises.push(fs.writeFile(`${contentDir}/config.json`, JSON.stringify(config, null, 2)))
 
+let index = 0
 for (const { id, slug, title, content } of selectPages.iterate()) {
   const { frontMatter, markdown } = extractFrontMatter(content)
   const actualSlug = uniqueSlug(slug || frontMatter.slug, id)
   const actualTitle = title || frontMatter.title || slug || 'Post'
   const metadata = {
+    index: index++,
     slug: actualSlug,
     title: actualTitle
   }
